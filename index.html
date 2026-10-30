@@ -1,0 +1,1550 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SentinelOTA | Secure OTA Management</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+    --bg: #080e1c;
+    --sidebar: #101a2e;
+    --card: #142039;
+    --border: #293955;
+    --text: #eaf1ff;
+    --muted: #91a3c0;
+    --primary: #3b82f6;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 26px 18px;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    color: #60a5fa;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 40px;
+}
+
+.nav-item {
+    padding: 14px;
+    margin-bottom: 9px;
+    border-radius: 9px;
+    cursor: pointer;
+    color: var(--muted);
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #1e3a5f;
+    color: white;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 30px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.main {
+    margin-left: 260px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.header p,
+.muted {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.badge {
+    background: #123e35;
+    color: #4ade80;
+    padding: 9px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.notice {
+    background: #172b49;
+    border: 1px solid #365b90;
+    padding: 14px;
+    border-radius: 10px;
+    color: #bfdbfe;
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.card,
+.panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.card h3 {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.number {
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.blue { color: #60a5fa; }
+.green { color: #4ade80; }
+.orange { color: #fbbf24; }
+.red { color: #f87171; }
+
+.panel {
+    margin-bottom: 25px;
+    overflow-x: auto;
+}
+
+.panel h2 {
+    font-size: 19px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    color: var(--muted);
+    font-weight: normal;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.online {
+    background: #124331;
+    color: #4ade80;
+}
+
+.offline {
+    background: #4b2630;
+    color: #f87171;
+}
+
+.pending {
+    background: #49381c;
+    color: #fbbf24;
+}
+
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 4px 5px 4px 0;
+}
+
+button:hover {
+    filter: brightness(1.15);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+    background: #dc2626;
+}
+
+.btn-secondary {
+    background: #334155;
+}
+
+input, select {
+    width: 100%;
+    background: #0d1729;
+    color: white;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.progress-container {
+    width: 100%;
+    height: 18px;
+    background: #0b1426;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2563eb, #22c55e);
+    transition: width .4s;
+}
+
+.progress-text {
+    color: var(--muted);
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.log {
+    background: #0b1426;
+    padding: 13px;
+    border-radius: 8px;
+    margin-bottom: 9px;
+    font-family: monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.log-info { color: #93c5fd; }
+.log-success { color: #4ade80; }
+.log-error { color: #f87171; }
+
+.chart-box {
+    height: 280px;
+    position: relative;
+}
+
+@media(max-width: 1000px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 700px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-footer {
+        position: static;
+        margin-top: 20px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 16px;
+    }
+
+    .cards,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">🛡 SentinelOTA</div>
+
+    <div class="subtitle">
+        Secure Vehicle Software Management
+    </div>
+
+    <div class="nav-item active"
+         onclick="showPage('dashboard', this)">
+        📊 Dashboard
+    </div>
+
+    <div class="nav-item"
+         onclick="showPage('vehicles', this)">
+        🚗 Vehicle Management
+    </div>
+
+    <div class="nav-item"
+         onclick="showPage('updates', this)">
+        📦 Software Updates
+    </div>
+
+    <div class="nav-item"
+         onclick="showPage('deployment', this)">
+        🚀 OTA Deployment
+    </div>
+
+    <div class="nav-item"
+         onclick="showPage('security', this)">
+        🔐 Security Monitoring
+    </div>
+
+    <div class="nav-item"
+         onclick="showPage('history', this)">
+        📜 Update History
+    </div>
+
+    <div class="sidebar-footer">
+        B.Tech Major Project<br>
+        Version 1.0<br>
+        Python + FastAPI Simulation
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+    <div class="header">
+
+        <div>
+            <h1 id="pageTitle">Dashboard Overview</h1>
+            <p>
+                Secure Over-the-Air Software Update
+                Management System
+            </p>
+        </div>
+
+        <div class="badge" id="serverStatus">
+            ● Checking Backend
+        </div>
+
+    </div>
+
+    <div class="notice">
+        Academic simulation prototype.
+        Deployment is processed by the Python backend.
+        Firmware downloads, SHA-256 verification,
+        Ed25519 signatures and physical ECU installation
+        are not implemented yet.
+    </div>
+
+
+    <!-- DASHBOARD -->
+
+    <section id="dashboard" class="page active">
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Vehicles</h3>
+                <div class="number blue" id="totalVehicles">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Successful Updates</h3>
+                <div class="number green" id="successfulUpdates">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Pending Updates</h3>
+                <div class="number orange" id="pendingUpdates">0</div>
+            </div>
+
+            <div class="card">
+                <h3>Failed Updates</h3>
+                <div class="number red" id="failedUpdates">0</div>
+            </div>
+
+        </div>
+
+        <div class="panel">
+            <h2>OTA Deployment Analytics</h2>
+            <div class="chart-box">
+                <canvas id="deploymentChart"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+
+            <h2>Registered Vehicles</h2>
+
+            <button class="btn-secondary"
+                    onclick="loadVehiclesFromBackend()">
+                Refresh from Python
+            </button>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vehicle ID</th>
+                        <th>Model</th>
+                        <th>Version</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="dashboardVehicleTable"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- VEHICLES -->
+
+    <section id="vehicles" class="page">
+
+        <div class="panel">
+
+            <h2>Vehicle Management</h2>
+
+            <p class="muted">
+                Registered vehicles are loaded from Python.
+                New vehicle registration will be connected
+                to a backend API in the next phase.
+            </p>
+
+            <br>
+
+            <button onclick="loadVehiclesFromBackend()">
+                Refresh Vehicles
+            </button>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vehicle ID</th>
+                        <th>Model</th>
+                        <th>Version</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="vehicleTable"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- SOFTWARE UPDATES -->
+
+    <section id="updates" class="page">
+
+        <div class="panel">
+
+            <h2>Create Simulated Software Release</h2>
+
+            <p class="muted">
+                These releases are stored in the browser
+                temporarily. Actual package uploads and
+                signing will be developed later.
+            </p>
+
+            <br>
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Software Name</label>
+                    <input id="softwareName"
+                           placeholder="Infotainment Update">
+                </div>
+
+                <div>
+                    <label>New Version</label>
+                    <input id="softwareVersion"
+                           placeholder="1.2">
+                </div>
+
+                <div>
+                    <label>Compatible Vehicle Model</label>
+                    <input id="compatibleModel"
+                           placeholder="Demo EV A">
+                </div>
+
+                <div>
+                    <label>Target Component</label>
+
+                    <select id="softwareComponent">
+                        <option>Infotainment</option>
+                        <option>Navigation</option>
+                        <option>Climate Control</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button onclick="addUpdate()">
+                + Create Release
+            </button>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>Available Releases</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Software</th>
+                        <th>Version</th>
+                        <th>Model</th>
+                        <th>Component</th>
+                    </tr>
+                </thead>
+
+                <tbody id="updateTable"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- DEPLOYMENT -->
+
+    <section id="deployment" class="page">
+
+        <div class="panel">
+
+            <h2>OTA Deployment Center</h2>
+
+            <p class="muted">
+                Select a vehicle and software release.
+                The Python backend will execute the
+                simulated update.
+            </p>
+
+            <br>
+
+            <label>Select Vehicle</label>
+            <select id="deployVehicle"></select>
+
+            <label>Select Update</label>
+            <select id="deployUpdate"></select>
+
+            <button id="deployButton"
+                    onclick="startDeployment(false)">
+                🚀 Deploy Update
+            </button>
+
+            <button id="failureButton"
+                    class="btn-danger"
+                    onclick="startDeployment(true)">
+                Simulate Installation Failure
+            </button>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>Deployment Progress</h2>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <p class="progress-text" id="progressText">
+                No deployment running.
+            </p>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>Vehicle Simulator Console</h2>
+
+            <div id="deploymentLogs">
+                <div class="log log-info">
+                    Waiting for deployment request...
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SECURITY -->
+
+    <section id="security" class="page">
+
+        <div class="panel">
+
+            <h2>Security Architecture</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mechanism</th>
+                        <th>Purpose</th>
+                        <th>Current Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>SHA-256</td>
+                        <td>Verify update file integrity</td>
+                        <td>Planned</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ed25519</td>
+                        <td>Verify digital signatures</td>
+                        <td>Planned</td>
+                    </tr>
+
+                    <tr>
+                        <td>JWT</td>
+                        <td>Administrator authentication</td>
+                        <td>Planned</td>
+                    </tr>
+
+                    <tr>
+                        <td>Version Validation</td>
+                        <td>Reject old software versions</td>
+                        <td>Basic backend check</td>
+                    </tr>
+
+                    <tr>
+                        <td>Rollback</td>
+                        <td>Restore previous version on failure</td>
+                        <td>Basic Python simulation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>Security Test Demonstrations</h2>
+
+            <button onclick="simulateSecurityTest('tamper')">
+                Simulate Tampered File
+            </button>
+
+            <button onclick="simulateSecurityTest('signature')">
+                Simulate Invalid Signature
+            </button>
+
+            <div class="log log-info"
+                 id="securityTestResult">
+                Choose a security demonstration.
+            </div>
+
+        </div>
+
+        <div class="panel">
+
+            <h2>Security Event Logs</h2>
+
+            <div id="securityLogs">
+                <div class="log log-info">
+                    No events recorded.
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HISTORY -->
+
+    <section id="history" class="page">
+
+        <div class="panel">
+
+            <h2>Deployment History</h2>
+
+            <p class="muted">
+                Session history only. PostgreSQL storage
+                will be added later.
+            </p>
+
+            <br>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Deployment ID</th>
+                        <th>Vehicle</th>
+                        <th>Update</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody id="historyTable"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+// ==========================================
+// APPLICATION STATE
+// ==========================================
+
+let vehicles = [];
+
+let updates = [
+    {
+        id: "UPD001",
+        name: "Infotainment Update",
+        version: "1.1",
+        model: "Demo EV A",
+        component: "Infotainment"
+    },
+    {
+        id: "UPD002",
+        name: "Navigation Update",
+        version: "1.2",
+        model: "Demo EV B",
+        component: "Navigation"
+    }
+];
+
+let deployments = [];
+let securityEvents = [];
+let deploymentRunning = false;
+let chart = null;
+let backendConnected = false;
+let nextUpdateNumber = 3;
+
+
+// ==========================================
+// HTML ESCAPING
+// ==========================================
+
+function escapeHTML(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+
+// ==========================================
+// PAGE NAVIGATION
+// ==========================================
+
+function showPage(pageId, element) {
+
+    document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+    });
+
+    document.getElementById(pageId).classList.add("active");
+
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
+
+    element.classList.add("active");
+
+    const titles = {
+        dashboard: "Dashboard Overview",
+        vehicles: "Vehicle Management",
+        updates: "Software Update Management",
+        deployment: "OTA Deployment Center",
+        security: "Security Monitoring",
+        history: "Update History"
+    };
+
+    document.getElementById("pageTitle").textContent =
+        titles[pageId];
+
+    renderAll();
+}
+
+
+// ==========================================
+// LOAD VEHICLES FROM PYTHON BACKEND
+// ==========================================
+
+async function loadVehiclesFromBackend() {
+
+    const status = document.getElementById("serverStatus");
+
+    status.textContent = "● Connecting...";
+
+    try {
+
+        const response = await fetch("/api/vehicles", {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                "Backend returned HTTP " + response.status
+            );
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            throw new Error("Invalid vehicle response");
+        }
+
+        vehicles = data;
+
+        backendConnected = true;
+
+        status.textContent = "● Python Backend Connected";
+        status.style.color = "#4ade80";
+        status.style.background = "#123e35";
+
+        renderAll();
+
+        console.log("Vehicles loaded:", vehicles);
+
+    } catch (error) {
+
+        backendConnected = false;
+
+        status.textContent = "● Backend Disconnected";
+        status.style.color = "#f87171";
+        status.style.background = "#4b2630";
+
+        console.error(error);
+
+        renderAll();
+    }
+}
+
+
+// ==========================================
+// RENDER VEHICLES
+// ==========================================
+
+function renderVehicles() {
+
+    const rows = vehicles.map(vehicle => `
+
+        <tr>
+            <td>${escapeHTML(vehicle.id)}</td>
+            <td>${escapeHTML(vehicle.model)}</td>
+            <td>v${escapeHTML(vehicle.version)}</td>
+            <td>
+                <span class="status ${
+                    vehicle.status === "Online"
+                        ? "online"
+                        : "offline"
+                }">
+                    ${escapeHTML(vehicle.status)}
+                </span>
+            </td>
+        </tr>
+
+    `).join("");
+
+    const emptyRow = `
+        <tr>
+            <td colspan="4">
+                No vehicles loaded. Check Python backend.
+            </td>
+        </tr>
+    `;
+
+    document.getElementById("vehicleTable").innerHTML =
+        rows || emptyRow;
+
+    document.getElementById("dashboardVehicleTable").innerHTML =
+        rows || emptyRow;
+}
+
+
+// ==========================================
+// DASHBOARD
+// ==========================================
+
+function renderDashboard() {
+
+    const successful = deployments.filter(
+        d => d.status === "Successful"
+    ).length;
+
+    const failed = deployments.filter(
+        d => d.status === "Failed"
+    ).length;
+
+    const pending = deployments.filter(
+        d => d.status === "Pending"
+    ).length;
+
+    document.getElementById("totalVehicles").textContent =
+        vehicles.length;
+
+    document.getElementById("successfulUpdates").textContent =
+        successful;
+
+    document.getElementById("failedUpdates").textContent =
+        failed;
+
+    document.getElementById("pendingUpdates").textContent =
+        pending;
+
+    if (typeof Chart !== "undefined") {
+
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(
+            document.getElementById("deploymentChart"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: [
+                        "Successful",
+                        "Failed",
+                        "Pending"
+                    ],
+
+                    datasets: [{
+                        data: [successful, failed, pending],
+
+                        backgroundColor: [
+                            "#22c55e",
+                            "#ef4444",
+                            "#f59e0b"
+                        ]
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                color: "#eaf1ff"
+                            }
+                        }
+                    }
+                }
+            }
+        );
+    }
+}
+
+
+// ==========================================
+// CREATE SOFTWARE RELEASE
+// ==========================================
+
+function addUpdate() {
+
+    const name = document.getElementById(
+        "softwareName"
+    ).value.trim();
+
+    const version = document.getElementById(
+        "softwareVersion"
+    ).value.trim().replace(/^v/i, "");
+
+    const model = document.getElementById(
+        "compatibleModel"
+    ).value.trim();
+
+    const component = document.getElementById(
+        "softwareComponent"
+    ).value;
+
+    if (!name || !version || !model) {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    if (!/^\d+(\.\d+)*$/.test(version)) {
+        alert("Enter a valid version, such as 1.2");
+        return;
+    }
+
+    const id = "UPD" +
+        String(nextUpdateNumber++).padStart(3, "0");
+
+    updates.push({
+        id,
+        name,
+        version,
+        model,
+        component
+    });
+
+    document.getElementById("softwareName").value = "";
+    document.getElementById("softwareVersion").value = "";
+    document.getElementById("compatibleModel").value = "";
+
+    renderAll();
+
+    alert("Simulated software release created!");
+}
+
+
+// ==========================================
+// RENDER SOFTWARE UPDATES
+// ==========================================
+
+function renderUpdates() {
+
+    document.getElementById("updateTable").innerHTML =
+        updates.map(update => `
+
+            <tr>
+                <td>${escapeHTML(update.id)}</td>
+                <td>${escapeHTML(update.name)}</td>
+                <td>v${escapeHTML(update.version)}</td>
+                <td>${escapeHTML(update.model)}</td>
+                <td>${escapeHTML(update.component)}</td>
+            </tr>
+
+        `).join("");
+}
+
+
+// ==========================================
+// DEPLOYMENT DROPDOWNS
+// ==========================================
+
+function renderDeploymentOptions() {
+
+    const vehicleSelect = document.getElementById(
+        "deployVehicle"
+    );
+
+    const updateSelect = document.getElementById(
+        "deployUpdate"
+    );
+
+    const selectedVehicle = vehicleSelect.value;
+    const selectedUpdate = updateSelect.value;
+
+    vehicleSelect.innerHTML = vehicles.map(vehicle => `
+
+        <option value="${escapeHTML(vehicle.id)}">
+            ${escapeHTML(vehicle.id)} -
+            ${escapeHTML(vehicle.model)}
+            (${escapeHTML(vehicle.status)})
+        </option>
+
+    `).join("");
+
+    updateSelect.innerHTML = updates.map(update => `
+
+        <option value="${escapeHTML(update.id)}">
+            ${escapeHTML(update.name)}
+            v${escapeHTML(update.version)}
+        </option>
+
+    `).join("");
+
+    if (vehicles.some(v => v.id === selectedVehicle)) {
+        vehicleSelect.value = selectedVehicle;
+    }
+
+    if (updates.some(u => u.id === selectedUpdate)) {
+        updateSelect.value = selectedUpdate;
+    }
+}
+
+
+// ==========================================
+// DEPLOYMENT LOGS
+// ==========================================
+
+function addDeploymentLog(message, type = "info") {
+
+    const container = document.getElementById(
+        "deploymentLogs"
+    );
+
+    const log = document.createElement("div");
+
+    log.className = "log log-" + type;
+
+    log.textContent =
+        "[" + new Date().toLocaleTimeString() + "] " +
+        message;
+
+    container.appendChild(log);
+}
+
+
+// ==========================================
+// OTA DEPLOYMENT - PYTHON CONNECTED
+// ==========================================
+
+async function startDeployment(forceFailure = false) {
+
+    if (deploymentRunning) {
+        alert("Deployment already running!");
+        return;
+    }
+
+    if (!backendConnected) {
+        alert(
+            "Python backend is not connected. " +
+            "Start FastAPI and refresh the page."
+        );
+        return;
+    }
+
+    const vehicleId = document.getElementById(
+        "deployVehicle"
+    ).value;
+
+    const updateId = document.getElementById(
+        "deployUpdate"
+    ).value;
+
+    const vehicle = vehicles.find(
+        v => v.id === vehicleId
+    );
+
+    const update = updates.find(
+        u => u.id === updateId
+    );
+
+    if (!vehicle || !update) {
+        alert("Select a vehicle and an update.");
+        return;
+    }
+
+    if (vehicle.status !== "Online") {
+        alert("Vehicle is offline.");
+        return;
+    }
+
+    if (vehicle.model !== update.model) {
+        alert(
+            "Incompatible vehicle model. " +
+            "Choose a compatible software release."
+        );
+        return;
+    }
+
+    deploymentRunning = true;
+
+    document.getElementById("deployButton").disabled = true;
+    document.getElementById("failureButton").disabled = true;
+
+    const progressBar = document.getElementById(
+        "progressBar"
+    );
+
+    const progressText = document.getElementById(
+        "progressText"
+    );
+
+    const logs = document.getElementById(
+        "deploymentLogs"
+    );
+
+    logs.innerHTML = "";
+
+    progressBar.style.width = "10%";
+
+    progressText.textContent =
+        "Request sent to Python backend...";
+
+    addDeploymentLog(
+        "Sending OTA deployment request to FastAPI..."
+    );
+
+    const deployment = {
+        id: "DEP" +
+            String(deployments.length + 1).padStart(3, "0"),
+
+        vehicleId: vehicleId,
+        updateId: updateId,
+        status: "Pending",
+        time: new Date().toLocaleString()
+    };
+
+    deployments.push(deployment);
+
+    renderDashboard();
+    renderHistory();
+
+    try {
+
+        const response = await fetch("/api/deploy", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                vehicle_id: vehicleId,
+                new_version: update.version,
+                simulate_failure: forceFailure
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                typeof result.detail === "string"
+                    ? result.detail
+                    : "Deployment request failed"
+            );
+        }
+
+        deployment.status = result.status;
+
+        vehicle.version = result.new_version;
+
+        progressBar.style.width = "100%";
+
+        if (result.status === "Successful") {
+
+            progressText.textContent =
+                "100% - Update Successful!";
+
+            addDeploymentLog(
+                "Python simulator completed the update.",
+                "success"
+            );
+
+            addDeploymentLog(
+                "Version: " +
+                result.old_version +
+                " → " +
+                result.new_version,
+                "success"
+            );
+
+            addSecurityEvent(
+                "Python simulation completed for " +
+                vehicleId,
+                "success"
+            );
+
+        } else {
+
+            progressText.textContent =
+                "Installation Failed - Rollback Simulated";
+
+            addDeploymentLog(
+                "Python simulator reported installation failure.",
+                "error"
+            );
+
+            addDeploymentLog(
+                "Previous version retained: " +
+                result.new_version,
+                "info"
+            );
+
+            addSecurityEvent(
+                "Installation failure simulated for " +
+                vehicleId,
+                "error"
+            );
+        }
+
+        renderAll();
+
+    } catch (error) {
+
+        deployment.status = "Failed";
+
+        progressText.textContent =
+            "Deployment request failed";
+
+        addDeploymentLog(error.message, "error");
+
+        alert("Error: " + error.message);
+
+        renderAll();
+
+    } finally {
+
+        deploymentRunning = false;
+
+        document.getElementById("deployButton").disabled = false;
+        document.getElementById("failureButton").disabled = false;
+
+        await loadVehiclesFromBackend();
+    }
+}
+
+
+// ==========================================
+// SECURITY EVENTS
+// ==========================================
+
+function addSecurityEvent(message, type = "info") {
+
+    securityEvents.unshift({
+        message,
+        type,
+        time: new Date().toLocaleString()
+    });
+
+    renderSecurityLogs();
+}
+
+
+function renderSecurityLogs() {
+
+    const container = document.getElementById(
+        "securityLogs"
+    );
+
+    if (securityEvents.length === 0) {
+
+        container.innerHTML = `
+            <div class="log log-info">
+                No security events recorded.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        securityEvents.map(event => `
+
+            <div class="log log-${event.type}">
+                [${escapeHTML(event.time)}]
+                ${escapeHTML(event.message)}
+            </div>
+
+        `).join("");
+}
+
+
+// ==========================================
+// SECURITY TEST DEMONSTRATIONS
+// ==========================================
+
+function simulateSecurityTest(type) {
+
+    const result = document.getElementById(
+        "securityTestResult"
+    );
+
+    result.className = "log log-error";
+
+    if (type === "tamper") {
+
+        result.textContent =
+            "DEMO ONLY: Tampered file detected. " +
+            "Update rejected. No SHA-256 calculation " +
+            "was performed.";
+
+        addSecurityEvent(
+            "Frontend demonstration: Tampered update rejected",
+            "error"
+        );
+
+    } else {
+
+        result.textContent =
+            "DEMO ONLY: Invalid digital signature. " +
+            "Update rejected. No Ed25519 verification " +
+            "was performed.";
+
+        addSecurityEvent(
+            "Frontend demonstration: Invalid signature rejected",
+            "error"
+        );
+    }
+}
+
+
+// ==========================================
+// DEPLOYMENT HISTORY
+// ==========================================
+
+function renderHistory() {
+
+    const table = document.getElementById(
+        "historyTable"
+    );
+
+    if (deployments.length === 0) {
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    No deployments recorded yet.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    table.innerHTML =
+        [...deployments].reverse().map(item => `
+
+            <tr>
+                <td>${escapeHTML(item.id)}</td>
+                <td>${escapeHTML(item.vehicleId)}</td>
+                <td>${escapeHTML(item.updateId)}</td>
+
+                <td>
+                    <span class="status ${
+                        item.status === "Successful"
+                            ? "online"
+                            : item.status === "Failed"
+                                ? "offline"
+                                : "pending"
+                    }">
+                        ${escapeHTML(item.status)}
+                    </span>
+                </td>
+
+                <td>${escapeHTML(item.time)}</td>
+            </tr>
+
+        `).join("");
+}
+
+
+// ==========================================
+// RENDER ALL COMPONENTS
+// ==========================================
+
+function renderAll() {
+
+    renderVehicles();
+    renderDashboard();
+    renderUpdates();
+    renderDeploymentOptions();
+    renderSecurityLogs();
+    renderHistory();
+}
+
+
+// ==========================================
+// START APPLICATION
+// ==========================================
+
+renderAll();
+
+loadVehiclesFromBackend();
+
+</script>
+
+</body>
+</html>
